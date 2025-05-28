@@ -1,6 +1,8 @@
 from database import Base
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 
+
+#Tässä luodaan taulu käyttäjille.
 class Users(Base):
     __tablename__ = "users"
 
@@ -13,6 +15,7 @@ class Users(Base):
     is_active = Column(Boolean, default=True)
     role = Column(String)
 
+#Tässä luodaan todo taulu.
 class Todos(Base):
     __tablename__ = "todos"
 
