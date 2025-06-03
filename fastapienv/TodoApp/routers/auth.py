@@ -1,14 +1,19 @@
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from models import Users
 from passlib.context import CryptContext #Tuodaan bcryptin käyttöön passlib-kirjastosta
-from fastapi.security import OAuth2PasswordRequestForm #Tuodaan OAuth2PasswordRequestForm, jota käytetään kirjautumiseen
-from jose import jwt
-router = APIRouter()
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer #Tuodaan OAuth2PasswordRequestForm, jota käytetään kirjautumiseen
+from jose import jwt, JWTError
+
+router = APIRouter(
+    prefix="/auth",
+    tags=["auth"]
+)
+# Tämä määrittelee reitit, jotka liittyvät käyttäjän todennukseen ja JWT-tunnusten luomiseen.
 
 SECRET_KEY = 'a49b24820ae3658dfea66bce4cadd2b520d92b64c0322dce4318d7c81b4cf18e'
 ALGORITHM = 'HS256'
@@ -17,6 +22,8 @@ ALGORITHM = 'HS256'
 
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # Tämä määrittelee bcryptin käytön salasanan hashaukseen.
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
+# Tämä määrittelee OAuth2-todennuksen ja tokenUrl:n, jota käytetään kirjautumiseen.
 
 class CreateUserRequest(BaseModel):
     username: str
@@ -62,8 +69,22 @@ def create_access_token(username:str, user_id:int, expires_delta: timedelta):
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
+async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        user_id: int = payload.get("id")
+        if username is None or user_id is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                detail='Could not validate user.')
+        return {"username": username, "id": user_id}
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail='Could not validate user.')
+
+
 # Luodaan CreateUserRequest luokka, joka määrittelee käyttäjän luomisen vaatimukset.
-@router.post("/auth", status_code=201)
+@router.post("/", status_code=201)
 async def create_user(db: db_dependency, 
                       create_user_request: CreateUserRequest):
     create_user_model = Users(
@@ -85,7 +106,8 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
                                  db: db_dependency):
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
-        return 'Failed Authentication'
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail='Could not validate user.')
     token = create_access_token(user.username, user.id, timedelta(minutes=20))
     return {'access_token': token, 'token_type': 'bearer'}
 # Tämä reitti käsittelee kirjautumisen ja palauttaa viestin onnistuneesta tai epäonnistuneesta todennuksesta.
