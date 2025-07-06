@@ -7,6 +7,7 @@ from database import SessionLocal
 from .auth import get_current_user
 
 router = APIRouter()
+# Tämä määrittelee reitit, jotka liittyvät käyttäjän toimintoihin.
 
 #Tässä tiedostossa luodaan endpointit todo-sovellukselle.
 #Tämä tiedosto on tarkoitettu todo-sovelluksen toiminnallisuuksien toteuttamiseen.
@@ -22,7 +23,9 @@ def get_db():
 
         
 db_dependency = Annotated[Session, Depends(get_db)]
+# Tämä määrittelee tietokantayhteyden riippuvuuden, jota käytetään reiteissä.
 user_dependency = Annotated[dict, Depends(get_current_user)]
+# Tämä määrittelee reitit, jotka liittyvät käyttäjän toimintoihin.
 
 class TodoRequest(BaseModel):
     priority: int = Field(gt=0, lt=6)

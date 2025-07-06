@@ -37,6 +37,7 @@ class CreateUserRequest(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+    # Tämä luokka määrittelee JWT-tunnuksen rakenteen, joka palautetaan kirjautumisen yhteydessä.
 
 def get_db():
     db = SessionLocal()
@@ -68,6 +69,7 @@ def create_access_token(username: str, user_id: int, role: str, expires_delta: t
     expires = datetime.now(timezone.utc) + expires_delta
     encode.update({"exp": expires})
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
+# Tämä funktio luo JWT-tunnuksen käyttäjälle.
 
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
@@ -101,6 +103,7 @@ async def create_user(db: db_dependency,
 
     db.add(create_user_model)
     db.commit()
+    # Tämä endpoint luo uuden käyttäjän tietokantaan.
 
 
 @router.post("/token", response_model=Token)
