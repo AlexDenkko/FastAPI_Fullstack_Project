@@ -104,3 +104,31 @@ def test_create_todo(test_todo):
     assert model.description == request_data.get('description')  # tarkistaa, että kuvaus on sama kuin pyynnössä
     assert model.priority == request_data.get('priority')  # tarkistaa, että prioriteetti on sama kuin pyynnössä
     assert model.complete == request_data.get('complete')  # tarkistaa, että valmis on sama kuin pyynnössä
+
+
+def test_update_todo(test_todo):
+    request_data = {
+        'title': 'Change the title of prompt already saved',
+        'description': 'Need to learn this.',
+        'priority': 5,
+        'complete': False,
+    }
+
+    response = client.put('/todo/1', json=request_data) # tekee PUT-pyynnön todos-endpointtiin
+    assert response.status_code == status.HTTP_204_NO_CONTENT # tarkistaa, että vastauskoodi on 204 NO CONTENT
+
+    db = TestingSessionLocal()  # luo uuden session testitietokantaa varten
+    model = db.query(Todos).filter(Todos.id == 1).first()  # hakee juuri päivitetyn Todos-tietueen testitietokannasta
+    assert model.title == 'Change the title of prompt already saved'  # tarkistaa, että otsikko on sama kuin pyynnössä
+
+def test_update_todo_not_found(test_todo):
+    request_data = {
+        'title': 'Change the title of prompt already saved',
+        'description': 'Need to learn this.',
+        'priority': 5,
+        'complete': False,
+    }
+
+    response = client.put('/todo/999', json=request_data) # tekee PUT-pyynnön todos-endpointtiin
+    assert response.status_code == 404 # tarkistaa, että vastauskoodi on 404 NOT FOUND
+    assert response.json() == {'detail': 'Todo not found.'} # tarkistaa, että vastaus on lista
