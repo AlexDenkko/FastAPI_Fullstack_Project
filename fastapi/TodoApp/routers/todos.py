@@ -43,7 +43,7 @@ async def read_all(user: user_dependency, db: db_dependency):
     return db.query(Todos).filter(Todos.owner_id == user.get('id')).all() 
 # Tämä endpoint palauttaa kaikki todo-tietueet tietokannasta jos olet sisäänkirjautunut / oikeutettu.
 
-@router.get("/{todo_id}", status_code=status.HTTP_200_OK)
+@router.get("/todo/{todo_id}", status_code=status.HTTP_200_OK)
 async def read_todo(user: user_dependency, db: db_dependency, todo_id: int = Path(gt=0)):
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication Failed")

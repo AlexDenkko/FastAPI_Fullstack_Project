@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine # tämä luo tietokantamoottorin
-from sqlalchemy.orm import sessionmaker, declarative_base # tämä luo session, jota käytetään tietokannan kanssa
+from sqlalchemy.orm import sessionmaker, declarative_base # tämä luo session ja perusluokan ORM-malleille
 from sqlalchemy.ext.declarative import declarative_base # tämä luo perusluokan, jota käytetään ORM-mallien kanssa
 
 #Tämä määrittää tietokannan osoitteen.

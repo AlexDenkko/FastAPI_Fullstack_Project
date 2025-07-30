@@ -68,3 +68,20 @@ def test_read_all_authenticated(test_todo: Todos):
         'priority': 5,
         'owner_id': 1
     }] # tarkistaa, että vastaus on lista
+
+def test_read_one_authenticated(test_todo):  
+    response = client.get("/todo/1") # tekee GET-pyynnön todos-endpointtiin
+    assert response.status_code == status.HTTP_200_OK # tarkistaa, että vastauskoodi on 200 OK
+    assert response.json() == {
+        'id': 1,  
+        'complete': False,
+        'title': 'Learn to code!',
+        'description': 'Need to learn everyday!',
+        'priority': 5,
+        'owner_id': 1
+    } # tarkistaa, että vastaus on lista
+
+def test_read_one_authenticated_not_found(test_todo):  
+    response = client.get("/todo/999") # tekee GET-pyynnön todos-endpointtiin
+    assert response.status_code == status.HTTP_404_NOT_FOUND # tarkistaa, että vastauskoodi on 404 NOT FOUND
+    assert response.json() == {'detail': 'Todo not found'} # tarkistaa, että vastaus on lista
