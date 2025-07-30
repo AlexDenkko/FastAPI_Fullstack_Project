@@ -132,3 +132,18 @@ def test_update_todo_not_found(test_todo):
     response = client.put('/todo/999', json=request_data) # tekee PUT-pyynnön todos-endpointtiin
     assert response.status_code == 404 # tarkistaa, että vastauskoodi on 404 NOT FOUND
     assert response.json() == {'detail': 'Todo not found.'} # tarkistaa, että vastaus on lista
+
+
+def test_delete_todo(test_todo):
+    response = client.delete('/todo/1') # tekee DELETE-pyynnön todos-endpointtiin
+    assert response.status_code == status.HTTP_204_NO_CONTENT # tarkistaa, että vastauskoodi on 204 NO CONTENT
+
+    db = TestingSessionLocal()  # luo uuden session testitietokantaa varten
+    model = db.query(Todos).filter(Todos.id == 1).first()  # hakee juuri poistettu Todos-tietueen testitietokannasta
+    assert model is None  # tarkistaa, että tietuetta ei ole enää olemassa
+
+
+def test_delete_todo_not_found(test_todo):
+    response = client.delete('/todo/999') # tekee DELETE-pyynnön todos-endpointtiin
+    assert response.status_code == 404 # tarkistaa, että vastauskoodi on 404 NOT FOUND
+    assert response.json() == {'detail': 'Todo not found.'} # tarkistaa, että vastaus on lista
