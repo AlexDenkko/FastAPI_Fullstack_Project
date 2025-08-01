@@ -5,7 +5,8 @@ from TodoApp.main import app # tuo pääsovelluksen, joka on määritelty main.p
 from TodoApp.database import Base  # tuo Base-luokan, jota käytetään ORM-mallien kanssa
 from fastapi.testclient import TestClient # tuo FastAPI:n testausasiakkaan, jota käytetään testauksessa
 import pytest # tuo pytest-kirjaston, jota käytetään testauksen hallintaan
-from TodoApp.models import Todos
+from TodoApp.models import Todos, Users
+from TodoApp.routers.auth import bcrypt_context
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db" # määrittelee SQLite-tietokannan osoitteen
 
@@ -51,3 +52,25 @@ def test_todo():
     with engine.connect() as connection:
         connection.execute(text("DELETE From todos;"))  # Tyhjentää testitietokannan todos-taulun
         connection.commit()
+
+
+
+
+@pytest.fixture # määrittelee testitietokannan käyttäjä-tietueen
+def test_user():
+    user = Users(  # luo uuden Users-tietueen testitietokantaa varten
+        username= "testnowforreal",
+        email= "testnow@example.com",
+        first_name= "Test",
+        last_name= "Testering",
+        hashed_password= bcrypt_context.hash("testpassword"),
+        role= "admin"
+    )
+
+    db = TestingSessionLocal()  # TÄRKEÄ! KÄYTÄ VAIN TESTI TIETOKANTAA MUUTEN TÄMÄ YLIKIRJOITTAA OIKEETA TIETOKANTAA
+    db.add(user)  # lisää testikäyttäjä-tietueen tietokantaan
+    db.commit()  # sitoo muutokset tietokantaan
+    yield user  # palauttaa testikäyttäjä-tietueen, jota voidaan käyttää testeissä
+    with engine.connect() as connection: # luo yhteys tietokantaan
+        connection.execute(text("DELETE From users;"))  # Tyhjentää testitietokannan users-taulun
+        connection.commit() # lähettää muutokset tietokantaan
