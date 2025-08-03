@@ -39,22 +39,22 @@ class UserVerification(BaseModel):
     # Tämä luokka määrittelee käyttäjän vahvistuksen vaatimukset, kuten nykyisen salasanan ja uuden salasanan.
 
 
-@router.get("/", status_code=status.HTTP_200_OK)
+@router.get("/", status_code=status.HTTP_200_OK) #tämä endpoint palauttaa käyttäjän tiedot
 async def get_user(user: user_dependency, db: db_dependency):
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication Failed")
     return db.query(Users).filter(Users.id == user.get('id')).first()
 # Tämä endpoint palauttaa käyttäjän tiedot tietokannasta jos olet sisäänkirjautunut / oikeutettu.
 
-@router.put("/password", status_code=status.HTTP_200_OK)
-async def change_password(user: user_dependency, db: db_dependency, 
+@router.put("/password", status_code=status.HTTP_200_OK) # tämä endpoint vaihtaa käyttäjän salasanan
+async def change_password(user: user_dependency, db: db_dependency,  
                           user_verification: UserVerification):
     if user is None:
-        raise HTTPException(status_code=401, detail="Authentication Failed")
+        raise HTTPException(status_code=401, detail="Authentication Failed") # tarkistaa, että käyttäjä on kirjautunut sisään
     
-    user_model = db.query(Users).filter(Users.id == user.get('id')).first()
+    user_model = db.query(Users).filter(Users.id == user.get('id')).first() # hakee käyttäjän tietokannasta
     if not bcrypt_context.verify(user_verification.password, user_model.hashed_password):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Error on password change")
     user_model.hashed_password = bcrypt_context.hash(user_verification.new_password)
-    db.add(user_model)
-    db.commit()
+    db.add(user_model) # päivittää käyttäjän salasanan
+    db.commit()  # tallentaa muutokset tietokantaan

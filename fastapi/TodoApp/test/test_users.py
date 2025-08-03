@@ -19,3 +19,10 @@ def test_change_password_success(test_user: Users):
     response = client.put("/user/password/", json={"password": "testpassword", 
                                                    "new_password": "newpassword"})  # tekee PUT-pyynnön salasanan vaihtamiseen
     assert response.status_code == 200  # tarkistaa, että vastauskoodi on 200 OK
+
+
+def test_change_password_failure(test_user: Users):
+    response = client.put("/user/password/", json={"password": "wrongpassword", 
+                                                   "new_password": "newpassword"})  # tekee PUT-pyynnön salasanan vaihtamiseen väärällä nykyisellä salasanalla
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.json()['detail'] == "Error on password change"  # tarkistaa, että virheilmoitus on oikea
