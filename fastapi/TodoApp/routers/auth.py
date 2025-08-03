@@ -8,6 +8,7 @@ from ..models import Users
 from passlib.context import CryptContext #Tuodaan bcryptin käyttöön passlib-kirjastosta
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer #Tuodaan OAuth2PasswordRequestForm, jota käytetään kirjautumiseen
 from jose import jwt, JWTError
+from fastapi import status
 
 router = APIRouter(
     prefix="/auth",
@@ -88,7 +89,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
 
 
 # Luodaan CreateUserRequest luokka, joka määrittelee käyttäjän luomisen vaatimukset.
-@router.post("/", status_code=201)
+@router.post("/", status_code=status.HTTP_201_CREATED) # tämä endpoint luo uuden käyttäjän
 async def create_user(db: db_dependency, 
                       create_user_request: CreateUserRequest):
     create_user_model = Users(
