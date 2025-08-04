@@ -10,7 +10,7 @@ from TodoApp.routers.auth import bcrypt_context
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db" # määrittelee SQLite-tietokannan osoitteen
 
-engine = create_engine(
+engine = create_engine( # luo tietokantamoottorin SQLite-tietokannalle
     SQLALCHEMY_DATABASE_URL,  # määrittelee tietokannan osoitteen
     connect_args={"check_same_thread": False}, # SQLite vaatii tämän argumentin monisäikeisessä käytössä
     poolclass= StaticPool, # käyttää staattista poolia, joka on hyödyllinen testauksessa
@@ -22,7 +22,7 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 Base.metadata.create_all(bind=engine) # luo kaikki taulut tietokantaan, jotka on määritelty Base-luokan perijöissä
 # Tämä on hyödyllistä testauksessa, jotta voidaan varmistaa, että tietokanta on valmis testejä varten.
 
-def override_get_db():
+def override_get_db(): #tämä funktio korvaa get_db-funktion testiversiolla
     db = TestingSessionLocal() # luo uuden session testauksessa
     try:
         yield db # palauttaa session, jota voidaan käyttää testeissä
@@ -57,7 +57,7 @@ def test_todo():
 
 
 @pytest.fixture # määrittelee testitietokannan käyttäjä-tietueen
-def test_user():
+def test_user(): #tämä funktio luo testikäyttäjän
     user = Users(  # luo uuden Users-tietueen testitietokantaa varten
         username= "testnowforreal",
         email= "testnow@example.com",

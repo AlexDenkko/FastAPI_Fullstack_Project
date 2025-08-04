@@ -6,7 +6,7 @@ from fastapi import status  # tuo HTTP-tilakoodit, joita käytetään testeissä
 app.dependency_overrides[get_db] = override_get_db  # korvaa get_db-funktion testiversiolla
 app.dependency_overrides[get_current_user] = override_get_current_user  # korvaa get_current_user-funktion testiversiolla
 
-def test_return_user(test_user: Users):
+def test_return_user(test_user: Users): #tämn funktio testaa käyttäjän palauttamisen
     response = client.get("/user/")  # tekee GET-pyynnön user-endpointtiin
     assert response.status_code == status.HTTP_200_OK  # tarkistaa, että vastauskoodi on 200 OK
     assert response.json()['username'] == test_user.username  # tarkistaa, että käyttäjänimi on sama kuin testikäyttäjällä
@@ -15,13 +15,13 @@ def test_return_user(test_user: Users):
     assert response.json()['last_name'] == test_user.last_name  # tarkistaa, että sukunimi on sama kuin testikäyttäjällä
     assert response.json()['role'] == test_user.role  # tarkistaa, että rooli on sama kuin testikäyttäjällä
 
-def test_change_password_success(test_user: Users):
+def test_change_password_success(test_user: Users): # tämä funktio testaa salasanan vaihtamisen onnistumisen
     response = client.put("/user/password/", json={"password": "testpassword", 
                                                    "new_password": "newpassword"})  # tekee PUT-pyynnön salasanan vaihtamiseen
     assert response.status_code == 200  # tarkistaa, että vastauskoodi on 200 OK
 
 
-def test_change_password_failure(test_user: Users):
+def test_change_password_failure(test_user: Users): # tämä funktio testaa salasanan vaihtamisen epäonnistumisen
     response = client.put("/user/password/", json={"password": "wrongpassword", 
                                                    "new_password": "newpassword"})  # tekee PUT-pyynnön salasanan vaihtamiseen väärällä nykyisellä salasanalla
     assert response.status_code == status.HTTP_403_FORBIDDEN
