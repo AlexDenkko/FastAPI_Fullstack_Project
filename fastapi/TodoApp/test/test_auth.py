@@ -4,6 +4,7 @@ from TodoApp.routers.auth import get_db, authenticate_user, create_access_token,
 from jose import jwt
 from datetime import timedelta
 import pytest
+from fastapi import HTTPException
 
 app.dependency_overrides[get_db] = override_get_db # korvaa get_db-funktion testiversiolla
 
@@ -43,3 +44,15 @@ async def test_get_current_user_valid_token(test_user: Users): #tämä funktio t
 
     user = await get_current_user(token=token)  # hakee nykyisen käyttäjän tokenin perusteella
     assert user == {'username': 'testuser', 'id': 1, 'user_role': 'admin'}  # tarkistaa, että käyttäjä on sama kuin tokenissa
+
+
+@pytest.mark.asyncio
+async def test_get_current_user_missing_payload():  # testaa, että käyttäjä ei löydy, jos tokenissa ei ole payloadia
+    encode = {'role': 'user'}
+    token = jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)  # koodaa token
+
+    with pytest.raises(HTTPException) as ex_cinfo:  # odottaa HTTPExceptionia
+        await get_current_user(token=token)
+
+    assert ex_cinfo.value.status_code == 401  # tarkistaa, että statuskoodi on 401 Unauthorized
+    assert ex_cinfo.value.detail == 'Could not validate user.'  # tarkistaa, että virheilmoitus on oikea
