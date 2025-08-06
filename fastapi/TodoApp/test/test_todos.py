@@ -9,7 +9,7 @@ app.dependency_overrides[get_current_user] = override_get_current_user # korvaa 
 
 
 def test_read_all_authenticated(test_todo: Todos):  
-    response = client.get("/") # tekee GET-pyynnön todos-endpointtiin
+    response = client.get("/todos") # tekee GET-pyynnön todos-endpointtiin
     assert response.status_code == status.HTTP_200_OK # tarkistaa, että vastauskoodi on 200 OK
     assert response.json() == [{
         'id': test_todo.id,  # include the id field
@@ -21,7 +21,7 @@ def test_read_all_authenticated(test_todo: Todos):
     }] # tarkistaa, että vastaus on lista
 
 def test_read_one_authenticated(test_todo):  
-    response = client.get("/todo/1") # tekee GET-pyynnön todos-endpointtiin
+    response = client.get("/todos/todo/1") # tekee GET-pyynnön todos-endpointtiin
     assert response.status_code == status.HTTP_200_OK # tarkistaa, että vastauskoodi on 200 OK
     assert response.json() == {
         'id': 1,  
@@ -33,7 +33,7 @@ def test_read_one_authenticated(test_todo):
     } # tarkistaa, että vastaus on lista
 
 def test_read_one_authenticated_not_found(test_todo):  
-    response = client.get("/todo/999") # tekee GET-pyynnön todos-endpointtiin
+    response = client.get("/todos/todo/999") # tekee GET-pyynnön todos-endpointtiin
     assert response.status_code == status.HTTP_404_NOT_FOUND # tarkistaa, että vastauskoodi on 404 NOT FOUND
     assert response.json() == {'detail': 'Todo not found'} # tarkistaa, että vastaus on lista
 
@@ -46,7 +46,7 @@ def test_create_todo(test_todo):
         'complete': False
     }
 
-    response = client.post('/todo/', json=request_data) # tekee POST-pyynnön todos-endpointtiin
+    response = client.post('/todos/todo/', json=request_data) # tekee POST-pyynnön todos-endpointtiin
     assert response.status_code == 201 # tarkistaa, että vastauskoodi on 201 CREATED
 
     db = TestingSessionLocal()  # luo uuden session testitietokantaa varten
@@ -65,7 +65,7 @@ def test_update_todo(test_todo):
         'complete': False,
     }
 
-    response = client.put('/todo/1', json=request_data) # tekee PUT-pyynnön todos-endpointtiin
+    response = client.put('/todos/todo/1', json=request_data) # tekee PUT-pyynnön todos-endpointtiin
     assert response.status_code == status.HTTP_204_NO_CONTENT # tarkistaa, että vastauskoodi on 204 NO CONTENT
 
     db = TestingSessionLocal()  # luo uuden session testitietokantaa varten
@@ -80,13 +80,13 @@ def test_update_todo_not_found(test_todo):
         'complete': False,
     }
 
-    response = client.put('/todo/999', json=request_data) # tekee PUT-pyynnön todos-endpointtiin
+    response = client.put('/todos/todo/999', json=request_data) # tekee PUT-pyynnön todos-endpointtiin
     assert response.status_code == 404 # tarkistaa, että vastauskoodi on 404 NOT FOUND
     assert response.json() == {'detail': 'Todo not found.'} # tarkistaa, että vastaus on lista
 
 
 def test_delete_todo(test_todo):
-    response = client.delete('/todo/1') # tekee DELETE-pyynnön todos-endpointtiin
+    response = client.delete('/todos/todo/1') # tekee DELETE-pyynnön todos-endpointtiin
     assert response.status_code == status.HTTP_204_NO_CONTENT # tarkistaa, että vastauskoodi on 204 NO CONTENT
 
     db = TestingSessionLocal()  # luo uuden session testitietokantaa varten
@@ -95,6 +95,6 @@ def test_delete_todo(test_todo):
 
 
 def test_delete_todo_not_found(test_todo):
-    response = client.delete('/todo/999') # tekee DELETE-pyynnön todos-endpointtiin
+    response = client.delete('todos/todo/999') # tekee DELETE-pyynnön todos-endpointtiin
     assert response.status_code == 404 # tarkistaa, että vastauskoodi on 404 NOT FOUND
     assert response.json() == {'detail': 'Todo not found.'} # tarkistaa, että vastaus on lista
