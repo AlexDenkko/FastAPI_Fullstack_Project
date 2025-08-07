@@ -16,7 +16,7 @@ templates = Jinja2Templates(directory="TodoApp/templates") # määrittelee malli
 def test(request: Request): 
     return templates.TemplateResponse("home.html", {"request": request}) # palauttaa home.html-mallipohjan, joka sijaitsee TodoApp/templates-hakemistossa
 
-@app.get("/healthy")
+@app.get("/healthy") # tämä on terveystarkistusreitti
 def health_check():
     return {"status": "healthy"}
 # tämä on terveystarkistus, joka palauttaa terveen tilan
@@ -24,4 +24,4 @@ def health_check():
 app.include_router(auth.router) # tämä tuo autentikointireitittimen
 app.include_router(todos.router) # tämä tuo todo-reitittimen
 app.include_router(admin.router) # tämä tuo admin-reitittimen
-app.include_router(users.router) # tämä tuo käyttäjä-reitittimen
+app.include_router(users.router) # tämä tuo käyttäjä-reitittimen 
