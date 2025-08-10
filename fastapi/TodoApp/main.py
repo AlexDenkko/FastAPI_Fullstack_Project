@@ -5,7 +5,7 @@ from .routers import auth, todos, admin, users # tämä tuo reitittimet eri toim
 from fastapi.templating import Jinja2Templates # tämä tuo Jinja2-mallipohjat
 from fastapi.staticfiles import StaticFiles # tämä tuo staattiset tiedostot, kuten CSS ja JavaScript
 
-app = FastAPI()
+app = FastAPI() # alustaa FastAPI-sovelluksen
 
 Base.metadata.create_all(bind=engine)
 # Luo kaikki taulut tietokannassa, jotka on määritelty malleissa
