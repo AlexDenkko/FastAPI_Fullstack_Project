@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from ..database import SessionLocal
@@ -9,6 +9,7 @@ from passlib.context import CryptContext #Tuodaan bcryptin käyttöön passlib-k
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer #Tuodaan OAuth2PasswordRequestForm, jota käytetään kirjautumiseen
 from jose import jwt, JWTError
 from fastapi import status
+from fastapi.templating import Jinja2Templates
 
 router = APIRouter(
     prefix="/auth",
@@ -49,7 +50,16 @@ def get_db():
 # Tämä funktio luo tietokantayhteyden ja sulkee sen lopuksi.
 # Se käyttää SessionLocal luokkaa, joka on määritelty database.py tiedostossa.
 
-db_dependency = Annotated[Session, Depends(get_db)]
+db_dependency = Annotated[Session, Depends(get_db)] 
+
+templates = Jinja2Templates(directory="TodoApp/templates") # Jinja2Templates luodaan
+
+### Sivut ###
+@router.get("/login-page", response_class=templates.TemplateResponse) # Kirjautumissivu
+def render_login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+### End-pointit ###
 
 def authenticate_user(username: str, password: str, db):
     user = db.query(Users).filter(Users.username == username).first()
