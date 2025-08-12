@@ -55,9 +55,13 @@ db_dependency = Annotated[Session, Depends(get_db)]
 templates = Jinja2Templates(directory="TodoApp/templates") # Jinja2Templates luodaan
 
 ### Sivut ###
-@router.get("/login-page", response_class=templates.TemplateResponse) # Kirjautumissivu
+@router.get("/login-page") # Kirjautumissivu
 def render_login_page(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
+
+@router.get("/register-page") # Rekisteröitymissivu
+def render_register_page(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
 
 ### End-pointit ###
 
