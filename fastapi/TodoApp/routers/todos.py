@@ -1,10 +1,14 @@
 from typing import Annotated
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, HTTPException, Path, status
+from fastapi import APIRouter, Depends, HTTPException, Path, status, Request
 from ..models import Todos
 from ..database import SessionLocal
 from .auth import get_current_user
+from starlette.responses import RedirectResponse #Tämä tuo uudelleenohjauksen
+from fastapi.templating import Jinja2Templates
+
+templates = Jinja2Templates(directory="TodoApp/templates")
 
 router = APIRouter(
     prefix="/todos",
@@ -35,6 +39,27 @@ class TodoRequest(BaseModel): # tämä luokka määrittelee todo-tietueen vaatim
     description: str = Field(min_length=3, max_length=100)
 # Tämä luokka määrittelee vaatimukset.
 
+def redirect_to_login():
+    redirect_to_login = RedirectResponse(url="/auth/login-page", status_code=status.HTTP_302_FOUND)
+    redirect_to_login.delete_cookie(key="access_token")
+    return redirect_to_login
+
+#### SIVUT #####
+@router.get("/todo-page", status_code=status.HTTP_200_OK)
+async def render_todo_page(db: db_dependency, request: Request):
+    try:
+        user = await get_current_user(request.cookies.get('access_token'))
+        if user is None:
+            return redirect_to_login()
+
+        todos = db.query(Todos).filter(Todos.owner_id == user.get('id')).all()
+
+        return templates.TemplateResponse("todo.html", {"request": request, "todos": todos, "user": user})
+    
+    except:
+        return redirect_to_login()
+
+#### ENDPOINTIT #####
 
 @router.get("/", status_code=status.HTTP_200_OK) # tämä endpoint palauttaa kaikki todo-tietueet
 async def read_all(user: user_dependency, db: db_dependency):
