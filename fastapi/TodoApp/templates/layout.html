@@ -1,4 +1,5 @@
-<!DOCTYPE html> <!-- Tämä on peruslayout -->
+<!DOCTYPE html>
+<!-- Tämä on peruslayout -->
 <html lang="en">
   <head>
     <link
@@ -14,8 +15,11 @@
     <title>TodoApp</title>
   </head>
   <body>
-    {% block content %} 
-    
-    {% endblock %}
+    {% block content %} {% endblock %}
+    <script src="{{ url_for('static', path='/js/jquery-slim.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/popper.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/bootstrap.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/base.js') }}" defer></script> <!-- defer meinaa, että skripti ladataan vasta, kun muu sivu on ladattu -->
+    <!-- Nämä tuovat Bootstrapin ja perus JavaScriptin -->
   </body>
 </html>
