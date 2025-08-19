@@ -1,23 +1,21 @@
-from fastapi import FastAPI, Request # tämä tuo FastAPI-sovelluskehyksen
+from fastapi import FastAPI, Request, status
 from .models import Base # tämä tuo mallit, jotka määrittelevät tietokannan rakenteen
 from .database import engine # tämä tuo moottorin tietokantayhteyttä varten
 from .routers import auth, todos, admin, users # tämä tuo reitittimet eri toiminnallisuuksia varten
-from fastapi.templating import Jinja2Templates # tämä tuo Jinja2-mallipohjat
 from fastapi.staticfiles import StaticFiles # tämä tuo staattiset tiedostot, kuten CSS ja JavaScript
+from fastapi.responses import RedirectResponse #tämä tuo uudelleenohjausvastaukset
 
 app = FastAPI() # alustaa FastAPI-sovelluksen
 
 Base.metadata.create_all(bind=engine)
 # Luo kaikki taulut tietokannassa, jotka on määritelty malleissa
 
-templates = Jinja2Templates(directory="TodoApp/templates") # määrittelee mallipohjat hakemistosta
-
 app.mount("/static", StaticFiles(directory="TodoApp/static"), name="static") # liittää staattiset tiedostot, kuten CSS ja JavaScript, TodoApp/static-hakemistosta
 
 
-@app.get("/") # tämä on pääsivu, joka palauttaa tervetuloviestin
+@app.get("/") 
 def test(request: Request): 
-    return templates.TemplateResponse("home.html", {"request": request}) # palauttaa home.html-mallipohjan, joka sijaitsee TodoApp/templates-hakemistossa
+    return RedirectResponse(url="/todos/todo-page", status_code=status.HTTP_302_FOUND) #tämä ohjaa käyttäjän todo-sivulle
 
 @app.get("/healthy") # tämä on terveystarkistusreitti
 def health_check():
