@@ -59,6 +59,19 @@ async def render_todo_page(db: db_dependency, request: Request):
     except:
         return redirect_to_login()
 
+@router.get("/add-todo-page", status_code=status.HTTP_200_OK)
+async def render_todo_page(request: Request):
+    try:
+        user = await get_current_user(request.cookies.get('access_token'))
+        if user is None:
+            return redirect_to_login()
+
+        return templates.TemplateResponse("add-todo.html", {"request": request, "user": user})
+    
+    except:
+        return redirect_to_login()
+
+
 #### ENDPOINTIT #####
 
 @router.get("/", status_code=status.HTTP_200_OK) # tämä endpoint palauttaa kaikki todo-tietueet
