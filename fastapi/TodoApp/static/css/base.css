@@ -10,16 +10,26 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .main-color {
-  background-color: #0e76a8 ;
+  background-color: #ff385d ;
 }
 
 .strike-through-td {
     text-decoration: line-through;
 }
 
-/* h1 {
-  color: red;
-} */
+#navbar-main-text {
+  color: #fafafa !important;
+}
+
+#add-new-button {
+  color: #fafafa !important;
+}
+
+a {
+  color: #ff385d !important;
+}
+
+
 
 
 

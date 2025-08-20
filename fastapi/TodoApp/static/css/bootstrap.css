@@ -2422,14 +2422,14 @@ fieldset:disabled a.btn {
 
 .btn-primary {
   color: #fff;
-  background-color: #0e76a8;
-  border-color: #0e76a8;
+  background-color: #ff385d;
+  border-color: #ff385d;
 }
 
 .btn-primary:hover {
   color: #fff;
-  background-color: #0069d9;
-  border-color: #0062cc;
+  background-color: #d42643;
+  border-color: #d42643;
 }
 
 .btn-primary:focus, .btn-primary.focus {
@@ -2489,15 +2489,15 @@ fieldset:disabled a.btn {
 }
 
 .btn-success {
-  color: #fff;
-  background-color: #28a745;
-  border-color: #28a745;
+  color: #fff !important;
+  background-color: #4B4B4BFF;
+  border-color: #4B4B4BFF;
 }
 
 .btn-success:hover {
   color: #fff;
-  background-color: #218838;
-  border-color: #1e7e34;
+  background-color: #070707FF;
+  border-color: #070707FF;
 }
 
 .btn-success:focus, .btn-success.focus {
@@ -2524,14 +2524,14 @@ fieldset:disabled a.btn {
 
 .btn-info {
   color: #fff;
-  background-color: #17a2b8;
-  border-color: #17a2b8;
+  background-color: #ff385d;
+  border-color: #ff385d;
 }
 
 .btn-info:hover {
   color: #fff;
-  background-color: #138496;
-  border-color: #117a8b;
+  background-color: #d22444;
+  border-color: #d22444;
 }
 
 .btn-info:focus, .btn-info.focus {
@@ -2891,7 +2891,7 @@ fieldset:disabled a.btn {
 
 .btn-outline-light:hover {
   color: #212529;
-  background-color: #f8f9fa;
+  background-color: #dc3545;
   border-color: #f8f9fa;
 }
 
