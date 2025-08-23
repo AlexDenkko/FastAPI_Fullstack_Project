@@ -24,87 +24,68 @@ This project relies on the following Python packages. Here's a comprehensive bre
 - **FastAPI (v0.95.0)**
   - Modern web framework for building APIs
   - Provides high performance, automatic API documentation, and data validation
-  - Install: `pip install fastapi`
 
 - **Uvicorn (v0.20.0)**
   - ASGI server implementation for running FastAPI applications
   - Includes uvloop, httptools, and watchfiles for enhanced performance
-  - Install: `pip install uvicorn[standard]`
 
 #### Database Related
 - **SQLAlchemy (v2.0.7)**
   - SQL toolkit and Object-Relational Mapping (ORM)
-  - Install: `pip install sqlalchemy`
 
 - **psycopg2-binary (v2.9.6)**
   - PostgreSQL adapter for Python
-  - Install: `pip install psycopg2-binary`
 
 - **PyMySQL (v1.0.3)**
   - MySQL client library
-  - Install: `pip install PyMySQL`
 
 #### Security & Authentication
 - **python-jose (v3.3.0)**
   - Provides JWT token functionality
   - Includes rsa (v4.9) and ecdsa (v0.18.0) for cryptographic operations
-  - Install: `pip install python-jose[cryptography]`
 
 - **passlib (v1.7.4)**
   - Password hashing library
   - Works with bcrypt (v4.0.1)
-  - Install: `pip install passlib[bcrypt]`
 
 - **cryptography (v39.0.2)**
   - Cryptographic recipes and primitives
-  - Install: `pip install cryptography`
 
 - **python-multipart (v0.0.6)**
   - Handles form data parsing
-  - Install: `pip install python-multipart`
 
 #### Environment & Configuration
 - **python-dotenv (v1.0.0)**
   - Loads environment variables from .env files
-  - Install: `pip install python-dotenv`
 
 - **PyYAML (v6.0)**
   - YAML parser and emitter
-  - Install: `pip install PyYAML`
 
 #### ASGI Server Components
 - **uvloop (v0.17.0)**
   - Ultra-fast implementation of asyncio event loop
-  - Install: `pip install uvloop`
 
 - **httptools (v0.5.0)**
   - Fast HTTP parsing
-  - Install: `pip install httptools`
 
 - **watchfiles (v0.18.1)**
   - File system monitoring
-  - Install: `pip install watchfiles`
 
 - **websockets (v10.4)**
   - WebSocket client and server library
-  - Install: `pip install websockets`
 
 #### Additional Dependencies
 - **pydantic (v1.10.5)**
   - Data validation using Python type annotations
-  - Install: `pip install pydantic`
 
 - **starlette (v0.26.1)**
   - Lightweight ASGI framework
-  - Install: `pip install starlette`
 
 - **typing_extensions (v4.5.0)**
   - Backported typing hints
-  - Install: `pip install typing_extensions`
 
 - **anyio (v3.6.2)**
   - Asynchronous networking and concurrency
-  - Install: `pip install anyio`
 
 - Other supporting packages:
   - click (v8.1.3)
@@ -140,6 +121,71 @@ uvicorn main:app --reload
 ```
 
 Visit [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) for the interactive API documentation.
+
+### Testing with pytest
+
+#### Test Dependencies
+First, install the required testing packages:
+```bash
+pip install pytest pytest-asyncio httpx
+```
+
+#### Test Structure
+The tests are located in the `test/` directory and follow this structure:
+- `test_admin.py`: Admin functionality tests
+- `test_auth.py`: Authentication tests
+- `test_todos.py`: Todo operations tests
+- `test_users.py`: User management tests
+- `utils.py`: Testing utilities and fixtures
+
+#### Running Tests
+To run all tests:
+```bash
+pytest
+```
+
+To run specific test files:
+```bash
+pytest test/test_auth.py    # Run auth tests only
+pytest test/test_todos.py   # Run todo tests only
+```
+
+To run tests with detailed output:
+```bash
+pytest -v
+```
+
+To see print statements during tests:
+```bash
+pytest -s
+```
+
+To run a specific test function:
+```bash
+pytest test/test_auth.py::test_function_name
+```
+
+#### Test Coverage
+To check test coverage:
+```bash
+pip install pytest-cov
+pytest --cov=app tests/
+```
+
+#### Writing Tests
+Example of a test file structure:
+```python
+import pytest
+from fastapi.testclient import TestClient
+from main import app
+
+client = TestClient(app)
+
+def test_read_main():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.json() == {"message": "Hello World"}
+```
 
 ## Project Structure
 
@@ -203,3 +249,120 @@ fastapi_Learning/
 ## License
 
 This project is licensed under the MIT License.
+
+### MySQL Integration
+
+#### Setting up MySQL
+1. Install MySQL Server if not already installed:
+   - Download MySQL installer from [official website](https://dev.mysql.com/downloads/installer/)
+   - Run the installer and follow the setup wizard
+   - Remember your root password
+
+2. Create a new database and user:
+```sql
+CREATE DATABASE fastapi_db;
+CREATE USER 'fastapi_user'@'localhost' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON fastapi_db.* TO 'fastapi_user'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+#### Database Configuration
+1. Update your `.env` file with MySQL credentials:
+```ini
+DATABASE_URL=mysql+pymysql://fastapi_user:your_password@localhost:3306/fastapi_db
+```
+
+2. Modify `database.py` to use MySQL:
+```python
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
+
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL,
+    # Remove 'connect_args' as it's only needed for SQLite
+)
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+```
+
+#### Required Dependencies
+Ensure these packages are installed:
+```bash
+pip install pymysql cryptography
+```
+
+#### Database Migrations
+1. Install Alembic for database migrations:
+```bash
+pip install alembic
+```
+
+2. Initialize Alembic:
+```bash
+alembic init alembic
+```
+
+3. Update `alembic.ini` with your database URL:
+```ini
+sqlalchemy.url = mysql+pymysql://fastapi_user:your_password@localhost:3306/fastapi_db
+```
+
+4. Create a migration:
+```bash
+alembic revision --autogenerate -m "Initial migration"
+```
+
+5. Apply migrations:
+```bash
+alembic upgrade head
+```
+
+#### Troubleshooting MySQL Connection
+Common issues and solutions:
+
+1. Connection refused:
+   - Ensure MySQL service is running:
+     ```bash
+     # Windows
+     net start mysql80
+     
+     # Check status
+     net status mysql80
+     ```
+
+2. Authentication failed:
+   - Verify credentials in `.env` file
+   - Check user privileges:
+     ```sql
+     SHOW GRANTS FOR 'fastapi_user'@'localhost';
+     ```
+
+3. Database doesn't exist:
+   ```sql
+   CREATE DATABASE fastapi_db;
+   ```
+
+4. Reset user password if needed:
+   ```sql
+   ALTER USER 'fastapi_user'@'localhost' IDENTIFIED BY 'new_password';
+   FLUSH PRIVILEGES;
+   ```
+
+#### Backup and Restore
+Create database backup:
+```bash
+mysqldump -u fastapi_user -p fastapi_db > backup.sql
+```
+
+Restore database:
+```bash
+mysql -u fastapi_user -p fastapi_db < backup.sql
+```
