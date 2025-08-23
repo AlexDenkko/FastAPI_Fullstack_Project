@@ -109,7 +109,7 @@ To ensure compatibility, this project uses specific versions of each package. If
 ### Installation
 
 ```bash
-git clone https://github.com/yourusername/fastapi_Learning.git
+git clone https://github.com/AlexDenkko/fastapi_Learning.git
 cd fastapi_Learning
 pip install -r requirements.txt
 ```
