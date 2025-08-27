@@ -366,3 +366,102 @@ Restore database:
 ```bash
 mysql -u fastapi_user -p fastapi_db < backup.sql
 ```
+
+### SQLite Integration
+
+#### Setting up SQLite
+1. SQLite comes pre-installed with Python, so no additional installation is needed for the database engine itself.
+
+2. However, you'll need the SQLite development tools if you want to use the SQLite command line interface:
+
+   - **Windows:**
+     ```bash
+     # Download SQLite Tools from https://www.sqlite.org/download.html
+     # Look for "sqlite-tools-win32-x86-XXXXXXX.zip"
+     # Extract to C:\sqlite
+     # Add C:\sqlite to your PATH environment variable
+     ```
+
+   - **Verify installation:**
+     ```bash
+     sqlite3 --version
+     ```
+
+#### Database Configuration for SQLite
+1. Update your `.env` file with SQLite configuration:
+```ini
+DATABASE_URL=sqlite:///./sql_app.db
+```
+
+2. Ensure your `database.py` includes SQLite-specific configuration:
+```python
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./sql_app.db")
+
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL,
+    connect_args={"check_same_thread": False}  # Needed only for SQLite
+)
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+```
+
+#### SQLite Database Management
+1. Create a new database using Python shell:
+```python
+from database import Base, engine
+Base.metadata.create_all(bind=engine)
+```
+
+2. Using SQLite CLI:
+```bash
+# Open database
+sqlite3 sql_app.db
+
+# Common SQLite commands
+.tables          # List all tables
+.schema TableName # Show table schema
+.headers ON      # Show column headers
+.mode column     # Pretty print results
+.quit           # Exit SQLite CLI
+```
+
+#### SQLite Database Backup
+1. Using SQLite CLI:
+```bash
+# Create backup
+sqlite3 sql_app.db ".backup 'backup.db'"
+
+# Restore from backup
+sqlite3 new_db.db ".restore 'backup.db'"
+```
+
+2. Simple file copy (when database is not in use):
+```bash
+# Windows
+copy sql_app.db backup.db
+
+# Linux/Mac
+cp sql_app.db backup.db
+```
+
+#### SQLite Advantages
+- Zero-configuration - no server needed
+- Self-contained - entire database in a single file
+- Cross-platform compatible
+- Great for development and small to medium applications
+- Built-in Python support
+
+#### SQLite Limitations
+- Not suitable for high-concurrency applications
+- Limited to 2GB in most configurations
+- No user management/access control
+- No built-in encryption
